@@ -1,0 +1,28 @@
+<body>
+  <h2>Choose Your Form</h2>
+  <form id="characterForm">
+    <label>Gender:</label><br>
+    <input type="radio" name="gender" value="male" checked> Male<br>
+    <input type="radio" name="gender" value="female"> Female<br><br>
+
+    <label>Fur Color:</label><br>
+    <select name="fur">
+      <option value="brown">Brown</option>
+      <option value="gray">Gray</option>
+      <option value="neon">Neon</option>
+    </select><br><br>
+
+    <button type="submit">Enter the Bizarre</button>
+  </form>
+
+  <script>
+    document.getElementById("characterForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const fur = document.querySelector('select[name="fur"]').value;
+      localStorage.setItem("gender", gender);
+      localStorage.setItem("fur", fur);
+      window.location.href = "baltos_bizarre.html";
+    });
+  </script>
+</body>
