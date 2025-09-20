@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>theHUVA Wombat Frame</title>
+  <title>Balto's Bizarre</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="fc:frame" content="true" />
+  <meta property="fc:frame:image" content="https://huvabalto.github.io/TheHUVA/baltos_bizzare_bg.png" />
+  <meta property="fc:frame:button:1" content="Dance" />
+  <meta property="fc:frame:button:2" content="Sit" />
+  <meta property="fc:frame:button:3" content="Play Slots" />
   <style>
     body {
       margin: 0;
@@ -19,32 +25,122 @@
   </style>
 </head>
 <body>
-  <canvas id="wombatCanvas" width="64" height="64"></canvas>
+  <canvas id="gameCanvas" width="320" height="240"></canvas>
 
   <script>
-    const canvas = document.getElementById("wombatCanvas");
+    const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    const spriteSheet = new Image();
-    spriteSheet.src = "wombatmale_walk.png"; // Make sure this matches your uploaded file name
+    const background = new Image();
+    background.src = "baltos_bizzare_bg.png";
+
+    const wombatSprite = new Image();
+    wombatSprite.src = "wombatmale_walk.png"; // Replace with your actual sprite sheet
 
     const frameWidth = 64;
     const frameHeight = 64;
-    const totalFrames = 5; // Includes standing + 4 walk frames
+    const framesPerDirection = 4;
     let currentFrame = 0;
+    let currentDirection = 0; // 0 = down, 1 = up, 2 = left, 3 = right
 
-    function drawFrame() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
-        spriteSheet,
-        currentFrame * frameWidth, 0, frameWidth, frameHeight,
-        0, 0, frameWidth, frameHeight
-      );
-      currentFrame = (currentFrame + 1) % totalFrames;
+    let wombatX = 160;
+    let wombatY = 160;
+    const speed = 4;
+
+    // Buff logic
+    const dancerBuffZones = [
+      { x: 160, y: 80 },
+      { x: 192, y: 80 },
+      { x: 160, y: 112 },
+      { x: 192, y: 112 }
+    ];
+    let sitStartTime = null;
+    let buffActive = false;
+
+    // Interaction zones
+    const npcZones = {
+      1: { x: 48, y: 32 }, // bartender
+      2: { x: 64, y: 96 },
+      3: { x: 64, y: 128 },
+      5: { x: 48, y: 32 }
+    };
+    const casinoZone = { x: 16, y: 32 };
+    const doorZones = [
+      { x: 0, y: 96 },
+      { x: 288, y: 32 }
+    ];
+
+    function isInsideZone(x, y, zone) {
+      return Math.abs(x - zone.x) < 16 && Math.abs(y - zone.y) < 16;
     }
 
-    spriteSheet.onload = () => {
-      setInterval(drawFrame, 150); // Adjust timing as needed
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(background, 0, 0);
+      ctx.drawImage(
+        wombatSprite,
+        currentFrame * frameWidth,
+        currentDirection * frameHeight,
+        frameWidth, frameHeight,
+        wombatX, wombatY,
+        frameWidth, frameHeight
+      );
+    }
+
+    function checkInteractions() {
+      if (dancerBuffZones.some(zone => isInsideZone(wombatX, wombatY, zone))) {
+        if (!sitStartTime) sitStartTime = Date.now();
+        const elapsed = Date.now() - sitStartTime;
+        if (elapsed >= 5 * 60 * 1000 && !buffActive) {
+          buffActive = true;
+          activateBuff();
+        }
+      } else {
+        sitStartTime = null;
+        buffActive = false;
+      }
+
+      if (isInsideZone(wombatX, wombatY, casinoZone)) {
+        console.log("Launch slot game");
+      }
+
+      if (isInsideZone(wombatX, wombatY, npcZones[1])) {
+        console.log("Talk to bartender");
+      }
+
+      if (isInsideZone(wombatX, wombatY, doorZones[0])) {
+        console.log("Enter left door");
+      }
+
+      if (isInsideZone(wombatX, wombatY, doorZones[1])) {
+        console.log("Enter right door");
+      }
+    }
+
+    function activateBuff() {
+      console.log("Buff activated!");
+      // Example: increase movement speed
+      wombatSpeed = speed * 1.5;
+      setTimeout(() => {
+        wombatSpeed = speed;
+        buffActive = false;
+      }, 60 * 60 * 1000);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      switch (e.key) {
+        case "ArrowUp": wombatY -= speed; currentDirection = 1; break;
+        case "ArrowDown": wombatY += speed; currentDirection = 0; break;
+        case "ArrowLeft": wombatX -= speed; currentDirection = 2; break;
+        case "ArrowRight": wombatX += speed; currentDirection = 3; break;
+      }
+      currentFrame = (currentFrame + 1) % framesPerDirection;
+      drawScene();
+      checkInteractions();
+    });
+
+    background.onload = () => {
+      drawScene();
     };
   </script>
 </body>
