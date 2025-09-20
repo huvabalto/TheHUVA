@@ -24,17 +24,59 @@
       background-size: cover;
     }
 
-    #openInventory {
+    #hud {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 50;
-      padding: 8px 16px;
+      bottom: 10px;
+      left: 10px;
+      z-index: 100;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    #dpad {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    #dpad div {
+      display: flex;
+      gap: 5px;
+    }
+
+    .dir {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      background: #222;
+      color: #fff;
+      border: 2px solid #6f00ff;
+      border-radius: 6px;
+    }
+
+    #chatButton, #openInventory {
+      padding: 8px 12px;
       background: #6f00ff;
       color: white;
       border: none;
       border-radius: 6px;
-      cursor: pointer;
+    }
+
+    #chatInput {
+      position: absolute;
+      bottom: 60px;
+      left: 10px;
+      width: 60%;
+      padding: 8px;
+      font-size: 16px;
+      border: 2px solid #6f00ff;
+      border-radius: 6px;
+      background: #111;
+      color: #fff;
+      display: none;
+      z-index: 101;
     }
 
     #inventoryScreen {
@@ -80,8 +122,22 @@
   </style>
 </head>
 <body>
-  <button id="openInventory">🎒 Inventory</button>
   <canvas id="gameCanvas" width="320" height="240"></canvas>
+
+  <div id="hud">
+    <div id="dpad">
+      <button class="dir" data-dir="up">↑</button>
+      <div>
+        <button class="dir" data-dir="left">←</button>
+        <button class="dir" data-dir="down">↓</button>
+        <button class="dir" data-dir="right">→</button>
+      </div>
+    </div>
+    <button id="chatButton">💬 Chat</button>
+    <button id="openInventory">🎒 Inventory</button>
+  </div>
+
+  <input type="text" id="chatInput" placeholder="Type message..." />
 
   <div id="inventoryScreen">
     <h3>Gear Inventory</h3>
@@ -139,75 +195,3 @@
       outfitTop.src = localStorage.getItem("top") ? `outfit_top_${localStorage.getItem("top")}.png` : "";
       outfitBottom.src = localStorage.getItem("bottom") ? `outfit_bottom_${localStorage.getItem("bottom")}.png` : "";
     }
-
-    function drawWombat() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const wombatX = canvas.width / 2 - 32;
-      const wombatY = canvas.height / 2 - 32;
-      const frameX = 0;
-      const frameY = 0;
-
-      ctx.drawImage(baseSprite, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
-      ctx.drawImage(furOverlay, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
-      ctx.drawImage(outfitBottom, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
-      ctx.drawImage(outfitTop, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
-      ctx.drawImage(helmetSprite, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
-    }
-
-    baseSprite.onload = () => {
-      updateGameSprite();
-      drawWombat();
-    };
-
-    document.getElementById("openInventory").addEventListener("click", () => {
-      const inv = document.getElementById("inventoryScreen");
-      inv.style.display = inv.style.display === "none" ? "block" : "none";
-      updatePreview();
-    });
-
-    document.querySelectorAll(".gearItem").forEach(item => {
-      item.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("type", item.dataset.type);
-        e.dataTransfer.setData("name", item.dataset.name);
-      });
-    });
-
-    document.querySelectorAll(".slot").forEach(slot => {
-      slot.addEventListener("dragover", e => e.preventDefault());
-      slot.addEventListener("drop", e => {
-        const type = e.dataTransfer.getData("type");
-        const name = e.dataTransfer.getData("name");
-
-        slot.innerHTML = `<img src="${type}_${name}.png" width="64" height="64" />`;
-        localStorage.setItem(type, name);
-        updatePreview();
-        updateGameSprite();
-        drawWombat();
-      });
-    });
-
-    function updatePreview() {
-      const ctx2 = document.getElementById("previewCanvas").getContext("2d");
-      ctx2.clearRect(0, 0, 64, 64);
-
-      const base = new Image();
-      base.src = baseSprite.src;
-
-      const helmet = new Image();
-      const top = new Image();
-      const bottom = new Image();
-
-      helmet.src = localStorage.getItem("helmet") ? `helmet_${localStorage.getItem("helmet")}.png` : "";
-      top.src = localStorage.getItem("top") ? `outfit_top_${localStorage.getItem("top")}.png` : "";
-      bottom.src = localStorage.getItem("bottom") ? `outfit_bottom_${localStorage.getItem("bottom")}.png` : "";
-
-      base.onload = () => {
-        ctx2.drawImage(base, 0, 0, 64, 64);
-        helmet.onload = () => ctx2.drawImage(helmet, 0, 0, 64, 64);
-        top.onload = () => ctx2.drawImage(top, 0, 0, 64, 64);
-        bottom.onload = () => ctx2.drawImage(bottom, 0, 0, 64, 64);
-      };
-    }
-  </script>
-</body>
-</html>
