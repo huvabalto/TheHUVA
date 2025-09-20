@@ -2,17 +2,24 @@
 <html>
 <head>
   <title>Balto's Bizarre</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
       background: #000;
-      color: #fff;
       font-family: monospace;
+      color: #fff;
     }
 
     #gameCanvas {
-      display: block;
-      margin: 0 auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       background: url('baltosbizzarebg.png') no-repeat center center;
       background-size: cover;
     }
@@ -44,6 +51,7 @@
 
     .gearGrid {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 10px;
     }
@@ -57,6 +65,7 @@
     .equipSlots {
       display: flex;
       gap: 10px;
+      margin-bottom: 10px;
     }
 
     .slot {
@@ -133,8 +142,8 @@
 
     function drawWombat() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const wombatX = 128;
-      const wombatY = 88;
+      const wombatX = canvas.width / 2 - 32;
+      const wombatY = canvas.height / 2 - 32;
       const frameX = 0;
       const frameY = 0;
 
