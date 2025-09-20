@@ -19,9 +19,24 @@
       top: 0;
       left: 0;
       width: 100vw;
-      height: 100vh;
-      background: url('baltosbizzarebg.png') no-repeat center center;
+      background: url('assets/baltosbizzarebg.png') no-repeat center center;
       background-size: cover;
+    }
+
+    @media screen and (orientation: portrait) {
+      #gameCanvas {
+        height: 50vh;
+      }
+      #hud {
+        top: 52vh;
+        bottom: auto;
+      }
+    }
+
+    @media screen and (orientation: landscape) {
+      #gameCanvas {
+        height: 100vh;
+      }
     }
 
     #hud {
@@ -36,25 +51,39 @@
     }
 
     #dpad {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    #dpad div {
-      display: flex;
-      gap: 5px;
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: grid;
+      grid-template-columns: 40px 40px 40px;
+      grid-template-rows: 40px 40px 40px;
+      background: #111;
+      border-radius: 50%;
+      padding: 10px;
+      box-shadow: 0 0 10px #6f00ff;
     }
 
     .dir {
       width: 40px;
       height: 40px;
-      font-size: 20px;
-      background: #222;
-      color: #fff;
-      border: 2px solid #6f00ff;
+      background: radial-gradient(circle at center, #444 0%, #222 100%);
+      border: 2px solid #999;
       border-radius: 6px;
+      font-size: 20px;
+      color: #eee;
+      box-shadow: inset -2px -2px 4px #000, inset 2px 2px 4px #666;
+      cursor: pointer;
     }
+
+    .dir:active {
+      transform: scale(0.95);
+      box-shadow: inset 0 0 6px #000;
+    }
+
+    .up    { grid-column: 2; grid-row: 1; }
+    .left  { grid-column: 1; grid-row: 2; }
+    .down  { grid-column: 2; grid-row: 3; }
+    .right { grid-column: 3; grid-row: 2; }
 
     #chatButton, #openInventory {
       padding: 8px 12px;
@@ -126,12 +155,10 @@
 
   <div id="hud">
     <div id="dpad">
-      <button class="dir" data-dir="up">↑</button>
-      <div>
-        <button class="dir" data-dir="left">←</button>
-        <button class="dir" data-dir="down">↓</button>
-        <button class="dir" data-dir="right">→</button>
-      </div>
+      <button class="dir up" data-dir="up">↑</button>
+      <button class="dir left" data-dir="left">←</button>
+      <button class="dir down" data-dir="down">↓</button>
+      <button class="dir right" data-dir="right">→</button>
     </div>
     <button id="chatButton">💬 Chat</button>
     <button id="openInventory">🎒 Inventory</button>
@@ -143,22 +170,22 @@
     <h3>Gear Inventory</h3>
     <div class="gearGrid">
       <div class="gearItem" draggable="true" data-type="helmet" data-name="cybervisor">
-        <img src="helmet_cybervisor.png" />
+        <img src="assets/helmet_cybervisor.png" />
       </div>
       <div class="gearItem" draggable="true" data-type="helmet" data-name="top_hat">
-        <img src="helmet_top_hat.png" />
+        <img src="assets/helmet_top_hat.png" />
       </div>
       <div class="gearItem" draggable="true" data-type="top" data-name="hoodie">
-        <img src="outfit_top_hoodie.png" />
+        <img src="assets/outfit_top_hoodie.png" />
       </div>
       <div class="gearItem" draggable="true" data-type="top" data-name="robe">
-        <img src="outfit_top_robe.png" />
+        <img src="assets/outfit_top_robe.png" />
       </div>
       <div class="gearItem" draggable="true" data-type="bottom" data-name="cargo">
-        <img src="outfit_bottom_cargo.png" />
+        <img src="assets/outfit_bottom_cargo.png" />
       </div>
       <div class="gearItem" draggable="true" data-type="bottom" data-name="skirt">
-        <img src="outfit_bottom_skirt.png" />
+        <img src="assets/outfit_bottom_skirt.png" />
       </div>
     </div>
 
@@ -173,26 +200,6 @@
     <canvas id="previewCanvas" width="64" height="64"></canvas>
   </div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    const gender = localStorage.getItem("gender") || "male";
-    const fur = localStorage.getItem("fur") || "neon";
-
-    const baseSprite = new Image();
-    baseSprite.src = gender === "female" ? "wombatfemale_walk.png" : "wombatmale_walk.png";
-
-    const furOverlay = new Image();
-    furOverlay.src = `fur_${fur}_overlay.png`;
-
-    const helmetSprite = new Image();
-    const outfitTop = new Image();
-    const outfitBottom = new Image();
-
-    function updateGameSprite() {
-      helmetSprite.src = localStorage.getItem("helmet") ? `helmet_${localStorage.getItem("helmet")}.png` : "";
-      outfitTop.src = localStorage.getItem("top") ? `outfit_top_${localStorage.getItem("top")}.png` : "";
-      outfitBottom.src = localStorage.getItem("bottom") ? `outfit_bottom_${localStorage.getItem("bottom")}.png` : "";
-    }
-<script src="scripts/game.js"></script>
+  <script type="module" src="scripts/init.js"></script>
+</body>
+</html>
