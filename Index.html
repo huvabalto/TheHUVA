@@ -31,39 +31,45 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
+    // Background
     const background = new Image();
     background.src = "baltos_bizzare_bg.png";
 
+    // Player wombat
     const wombatSprite = new Image();
-    wombatSprite.src = "wombatmale_walk.png"; // Replace with your actual sprite sheet
-
-    const frameWidth = 64;
-    const frameHeight = 64;
-    const framesPerDirection = 4;
-    let currentFrame = 0;
-    let currentDirection = 0; // 0 = down, 1 = up, 2 = left, 3 = right
+    wombatSprite.src = "wombatmale_walk.png"; // Replace with your actual sprite
 
     let wombatX = 160;
     let wombatY = 160;
-    const speed = 4;
+    let wombatFrame = 0;
+    let wombatDirection = 0; // 0 = down, 1 = up, 2 = left, 3 = right
+    const wombatSpeed = 4;
 
-    // Buff logic
+    // Dancer wombat
+    const dancerSprite = new Image();
+    dancerSprite.src = "wombat_dancer_loop.png";
+
+    const dancerFrameWidth = 64;
+    const dancerFrameHeight = 64;
+    const dancerTotalFrames = 4;
+    let dancerCurrentFrame = 0;
+    const dancerX = 224;
+    const dancerY = 96;
+
+    // Zones
     const dancerBuffZones = [
-      { x: 160, y: 80 },
-      { x: 192, y: 80 },
-      { x: 160, y: 112 },
-      { x: 192, y: 112 }
+      { x: 224, y: 96 },
+      { x: 256, y: 96 },
+      { x: 224, y: 128 },
+      { x: 256, y: 128 }
     ];
-    let sitStartTime = null;
-    let buffActive = false;
 
-    // Interaction zones
     const npcZones = {
-      1: { x: 48, y: 32 }, // bartender
+      1: { x: 48, y: 32 },
       2: { x: 64, y: 96 },
-      3: { x: 64, y: 128 },
-      5: { x: 48, y: 32 }
+      3: { x: 64, y: 128 }
     };
+
     const casinoZone = { x: 16, y: 32 };
     const doorZones = [
       { x: 0, y: 96 },
@@ -74,34 +80,42 @@
       return Math.abs(x - zone.x) < 16 && Math.abs(y - zone.y) < 16;
     }
 
+    function drawWombat() {
+      ctx.drawImage(
+        wombatSprite,
+        wombatFrame * 64,
+        wombatDirection * 64,
+        64, 64,
+        wombatX, wombatY,
+        64, 64
+      );
+    }
+
+    function drawDancer() {
+      ctx.drawImage(
+        dancerSprite,
+        dancerCurrentFrame * dancerFrameWidth, 0,
+        dancerFrameWidth, dancerFrameHeight,
+        dancerX, dancerY,
+        dancerFrameWidth, dancerFrameHeight
+      );
+    }
+
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(background, 0, 0);
-      ctx.drawImage(
-        wombatSprite,
-        currentFrame * frameWidth,
-        currentDirection * frameHeight,
-        frameWidth, frameHeight,
-        wombatX, wombatY,
-        frameWidth, frameHeight
-      );
+      drawWombat();
+      drawDancer();
     }
 
     function checkInteractions() {
       if (dancerBuffZones.some(zone => isInsideZone(wombatX, wombatY, zone))) {
-        if (!sitStartTime) sitStartTime = Date.now();
-        const elapsed = Date.now() - sitStartTime;
-        if (elapsed >= 5 * 60 * 1000 && !buffActive) {
-          buffActive = true;
-          activateBuff();
-        }
-      } else {
-        sitStartTime = null;
-        buffActive = false;
+        console.log("Buff zone entered");
+        // Trigger buff logic here
       }
 
       if (isInsideZone(wombatX, wombatY, casinoZone)) {
-        console.log("Launch slot game");
+        console.log("Play slots");
       }
 
       if (isInsideZone(wombatX, wombatY, npcZones[1])) {
@@ -117,27 +131,22 @@
       }
     }
 
-    function activateBuff() {
-      console.log("Buff activated!");
-      // Example: increase movement speed
-      wombatSpeed = speed * 1.5;
-      setTimeout(() => {
-        wombatSpeed = speed;
-        buffActive = false;
-      }, 60 * 60 * 1000);
-    }
-
     document.addEventListener("keydown", (e) => {
       switch (e.key) {
-        case "ArrowUp": wombatY -= speed; currentDirection = 1; break;
-        case "ArrowDown": wombatY += speed; currentDirection = 0; break;
-        case "ArrowLeft": wombatX -= speed; currentDirection = 2; break;
-        case "ArrowRight": wombatX += speed; currentDirection = 3; break;
+        case "ArrowUp": wombatY -= wombatSpeed; wombatDirection = 1; break;
+        case "ArrowDown": wombatY += wombatSpeed; wombatDirection = 0; break;
+        case "ArrowLeft": wombatX -= wombatSpeed; wombatDirection = 2; break;
+        case "ArrowRight": wombatX += wombatSpeed; wombatDirection = 3; break;
       }
-      currentFrame = (currentFrame + 1) % framesPerDirection;
+      wombatFrame = (wombatFrame + 1) % 4;
       drawScene();
       checkInteractions();
     });
+
+    setInterval(() => {
+      dancerCurrentFrame = (dancerCurrentFrame + 1) % dancerTotalFrames;
+      drawScene();
+    }, 300);
 
     background.onload = () => {
       drawScene();
