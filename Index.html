@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>theHUVA Wombat Frame</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      image-rendering: pixelated;
+      border: 2px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="wombatCanvas" width="64" height="64"></canvas>
+
+  <script>
+    const canvas = document.getElementById("wombatCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const spriteSheet = new Image();
+    spriteSheet.src = "wombatmale_walk.png"; // Make sure this matches your uploaded file name
+
+    const frameWidth = 64;
+    const frameHeight = 64;
+    const totalFrames = 5; // Includes standing + 4 walk frames
+    let currentFrame = 0;
+
+    function drawFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(
+        spriteSheet,
+        currentFrame * frameWidth, 0, frameWidth, frameHeight,
+        0, 0, frameWidth, frameHeight
+      );
+      currentFrame = (currentFrame + 1) % totalFrames;
+    }
+
+    spriteSheet.onload = () => {
+      setInterval(drawFrame, 150); // Adjust timing as needed
+    };
+  </script>
+</body>
+</html>
