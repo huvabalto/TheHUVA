@@ -1,1 +1,151 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: monospace;
+  color: #fff;
+}
 
+/* Responsive canvas */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  background: url('assets/baltosbizzarebg.png') no-repeat center center;
+  background-size: cover;
+}
+
+@media screen and (orientation: portrait) {
+  #gameCanvas {
+    height: 50vh;
+  }
+  #hud {
+    top: 52vh;
+    bottom: auto;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  #gameCanvas {
+    height: 100vh;
+  }
+}
+
+/* HUD container */
+#hud {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* SNES-style D-pad */
+#dpad {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: grid;
+  grid-template-columns: 40px 40px 40px;
+  grid-template-rows: 40px 40px 40px;
+  background: #111;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 0 10px #6f00ff;
+}
+
+.dir {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at center, #444 0%, #222 100%);
+  border: 2px solid #999;
+  border-radius: 6px;
+  font-size: 20px;
+  color: #eee;
+  box-shadow: inset -2px -2px 4px #000, inset 2px 2px 4px #666;
+  cursor: pointer;
+}
+
+.dir:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 0 6px #000;
+}
+
+.up    { grid-column: 2; grid-row: 1; }
+.left  { grid-column: 1; grid-row: 2; }
+.down  { grid-column: 2; grid-row: 3; }
+.right { grid-column: 3; grid-row: 2; }
+
+/* HUD buttons */
+#chatButton, #openInventory {
+  padding: 8px 12px;
+  background: #6f00ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* Chat input */
+#chatInput {
+  position: absolute;
+  bottom: 60px;
+  left: 10px;
+  width: 60%;
+  padding: 8px;
+  font-size: 16px;
+  border: 2px solid #6f00ff;
+  border-radius: 6px;
+  background: #111;
+  color: #fff;
+  display: none;
+  z-index: 101;
+}
+
+/* Inventory screen */
+#inventoryScreen {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: #111;
+  color: #fff;
+  padding: 20px;
+  border: 2px solid #6f00ff;
+  z-index: 100;
+  display: none;
+}
+
+.gearGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.gearItem img {
+  width: 32px;
+  height: 32px;
+  cursor: grab;
+}
+
+.equipSlots {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.slot {
+  width: 64px;
+  height: 64px;
+  background: #333;
+  border: 2px dashed #6f00ff;
+  text-align: center;
+  line-height: 64px;
+  color: #ccc;
+}
