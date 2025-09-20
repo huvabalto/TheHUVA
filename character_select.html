@@ -1,28 +1,31 @@
 <body>
-  <h2>Choose Your Form</h2>
-  <form id="characterForm">
-    <label>Gender:</label><br>
-    <input type="radio" name="gender" value="male" checked> Male<br>
-    <input type="radio" name="gender" value="female"> Female<br><br>
+  <h2>Choose Your Wombat</h2>
+  <div class="spriteRow">
+    <img src="wombat_male_front.png" onclick="selectGender('male')" />
+    <img src="wombat_female_front.png" onclick="selectGender('female')" />
+  </div>
 
-    <label>Fur Color:</label><br>
-    <select name="fur">
+  <div id="furPicker" style="display:none; margin-top:20px;">
+    <h3>Choose Your Fur Color</h3>
+    <select id="furColor">
       <option value="brown">Brown</option>
       <option value="gray">Gray</option>
       <option value="neon">Neon</option>
+      <option value="albino">Albino</option>
     </select><br><br>
-
-    <button type="submit">Enter the Bizarre</button>
-  </form>
+    <button onclick="enterBizarre()">Enter the Bizarre</button>
+  </div>
 
   <script>
-    document.getElementById("characterForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const gender = document.querySelector('input[name="gender"]:checked').value;
-      const fur = document.querySelector('select[name="fur"]').value;
+    function selectGender(gender) {
       localStorage.setItem("gender", gender);
+      document.getElementById("furPicker").style.display = "block";
+    }
+
+    function enterBizarre() {
+      const fur = document.getElementById("furColor").value;
       localStorage.setItem("fur", fur);
       window.location.href = "baltos_bizarre.html";
-    });
+    }
   </script>
 </body>
