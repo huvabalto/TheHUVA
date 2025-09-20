@@ -1,10 +1,204 @@
-const gender = localStorage.getItem("gender");
-const fur = localStorage.getItem("fur");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Balto's Bizarre</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: monospace;
+    }
 
-const wombatSprite = new Image();
-wombatSprite.src = gender === "female" ? "wombatfemale_walk.png" : "wombatmale_walk.png";
+    #gameCanvas {
+      display: block;
+      margin: 0 auto;
+      background: url('baltosbizzarebg.png') no-repeat center center;
+      background-size: cover;
+    }
 
-// Optional: apply fur tint logic here
-<button id="openInventory" style="position:absolute; top:10px; right:10px; z-index:50;">
-  🎒 Inventory
-</button>
+    #openInventory {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 50;
+      padding: 8px 16px;
+      background: #6f00ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #inventoryScreen {
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+      border: 2px solid #6f00ff;
+      z-index: 100;
+      display: none;
+    }
+
+    .gearGrid {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .gearItem img {
+      width: 32px;
+      height: 32px;
+      cursor: grab;
+    }
+
+    .equipSlots {
+      display: flex;
+      gap: 10px;
+    }
+
+    .slot {
+      width: 64px;
+      height: 64px;
+      background: #333;
+      border: 2px dashed #6f00ff;
+      text-align: center;
+      line-height: 64px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <button id="openInventory">🎒 Inventory</button>
+  <canvas id="gameCanvas" width="320" height="240"></canvas>
+
+  <div id="inventoryScreen">
+    <h3>Gear Inventory</h3>
+    <div class="gearGrid">
+      <div class="gearItem" draggable="true" data-type="helmet" data-name="cybervisor">
+        <img src="helmet_cybervisor.png" />
+      </div>
+      <div class="gearItem" draggable="true" data-type="helmet" data-name="top_hat">
+        <img src="helmet_top_hat.png" />
+      </div>
+      <div class="gearItem" draggable="true" data-type="top" data-name="hoodie">
+        <img src="outfit_top_hoodie.png" />
+      </div>
+      <div class="gearItem" draggable="true" data-type="top" data-name="robe">
+        <img src="outfit_top_robe.png" />
+      </div>
+      <div class="gearItem" draggable="true" data-type="bottom" data-name="cargo">
+        <img src="outfit_bottom_cargo.png" />
+      </div>
+      <div class="gearItem" draggable="true" data-type="bottom" data-name="skirt">
+        <img src="outfit_bottom_skirt.png" />
+      </div>
+    </div>
+
+    <h3>Equip Slots</h3>
+    <div class="equipSlots">
+      <div class="slot" id="helmetSlot">Helmet</div>
+      <div class="slot" id="topSlot">Top</div>
+      <div class="slot" id="bottomSlot">Bottom</div>
+    </div>
+
+    <h3>Preview</h3>
+    <canvas id="previewCanvas" width="64" height="64"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const gender = localStorage.getItem("gender") || "male";
+    const fur = localStorage.getItem("fur") || "neon";
+
+    const baseSprite = new Image();
+    baseSprite.src = gender === "female" ? "wombatfemale_walk.png" : "wombatmale_walk.png";
+
+    const furOverlay = new Image();
+    furOverlay.src = `fur_${fur}_overlay.png`;
+
+    const helmetSprite = new Image();
+    const outfitTop = new Image();
+    const outfitBottom = new Image();
+
+    function updateGameSprite() {
+      helmetSprite.src = localStorage.getItem("helmet") ? `helmet_${localStorage.getItem("helmet")}.png` : "";
+      outfitTop.src = localStorage.getItem("top") ? `outfit_top_${localStorage.getItem("top")}.png` : "";
+      outfitBottom.src = localStorage.getItem("bottom") ? `outfit_bottom_${localStorage.getItem("bottom")}.png` : "";
+    }
+
+    function drawWombat() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const wombatX = 128;
+      const wombatY = 88;
+      const frameX = 0;
+      const frameY = 0;
+
+      ctx.drawImage(baseSprite, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
+      ctx.drawImage(furOverlay, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
+      ctx.drawImage(outfitBottom, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
+      ctx.drawImage(outfitTop, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
+      ctx.drawImage(helmetSprite, frameX, frameY, 64, 64, wombatX, wombatY, 64, 64);
+    }
+
+    baseSprite.onload = () => {
+      updateGameSprite();
+      drawWombat();
+    };
+
+    document.getElementById("openInventory").addEventListener("click", () => {
+      const inv = document.getElementById("inventoryScreen");
+      inv.style.display = inv.style.display === "none" ? "block" : "none";
+      updatePreview();
+    });
+
+    document.querySelectorAll(".gearItem").forEach(item => {
+      item.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("type", item.dataset.type);
+        e.dataTransfer.setData("name", item.dataset.name);
+      });
+    });
+
+    document.querySelectorAll(".slot").forEach(slot => {
+      slot.addEventListener("dragover", e => e.preventDefault());
+      slot.addEventListener("drop", e => {
+        const type = e.dataTransfer.getData("type");
+        const name = e.dataTransfer.getData("name");
+
+        slot.innerHTML = `<img src="${type}_${name}.png" width="64" height="64" />`;
+        localStorage.setItem(type, name);
+        updatePreview();
+        updateGameSprite();
+        drawWombat();
+      });
+    });
+
+    function updatePreview() {
+      const ctx2 = document.getElementById("previewCanvas").getContext("2d");
+      ctx2.clearRect(0, 0, 64, 64);
+
+      const base = new Image();
+      base.src = baseSprite.src;
+
+      const helmet = new Image();
+      const top = new Image();
+      const bottom = new Image();
+
+      helmet.src = localStorage.getItem("helmet") ? `helmet_${localStorage.getItem("helmet")}.png` : "";
+      top.src = localStorage.getItem("top") ? `outfit_top_${localStorage.getItem("top")}.png` : "";
+      bottom.src = localStorage.getItem("bottom") ? `outfit_bottom_${localStorage.getItem("bottom")}.png` : "";
+
+      base.onload = () => {
+        ctx2.drawImage(base, 0, 0, 64, 64);
+        helmet.onload = () => ctx2.drawImage(helmet, 0, 0, 64, 64);
+        top.onload = () => ctx2.drawImage(top, 0, 0, 64, 64);
+        bottom.onload = () => ctx2.drawImage(bottom, 0, 0, 64, 64);
+      };
+    }
+  </script>
+</body>
+</html>
